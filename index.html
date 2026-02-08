@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tailwind CLI Project</title>
+    <link href="../src/output.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="max-w-[430px]  m-auto h-auto">
+        <h1 class="text-center mt-6 text-2xl font-bold tracking-wide text-blue-700 ">
+            Student list</h1>
+        <div class=" w-full flex items-center gap-3 mt-3  justify-center">
+            <input type="text" id="taskinput" onkeyup="handleEnter(event)"
+                class="rounded-md border-2 border-blue-400 focus:outline-3 focus:outline-blue-500 px-1 py-[6px] w-[300px] text-blue-600">
+            <button onclick="addTask()"
+                class="bg-blue-600 text-white px-4 rounded-sm py-[5px] border-b-4 border-b-blue-700 border-l-2 border-l-blue-700 active:translate-y-[-3px] transition-all active:shadow-lg">Add</button>
+        </div>
+        <div class="m-auto max-w-[375px] mt-7 h-auto overflow-y-auto max-h-[300px]">
+            <ul id="tasklist"></ul>
+        </div>
+
+    </div>
+</body>
+<script>
+    let task = [];
+
+    // Load tasks from local storage on startup
+    loadFromLocal();
+
+    function addTask() {
+        let inputElement = document.getElementById("taskinput");
+        let inputTask = inputElement.value;
+        if (inputTask.trim() == '') {
+            alert("សូមបញ្ចូលទិន្នន័យ!")
+            return;
+        }
+        task.push(inputTask);
+        inputElement.value = "";
+        displayTask();
+        saveToLocal();
+    }
+
+    function handleEnter(event) {
+        if (event.key === "Enter") {
+            addTask();
+        }
+    }
+
+    function displayTask() {
+        let list = document.getElementById("tasklist");
+        list.innerHTML = "";
+        for (let i = 0; i < task.length; i++) {
+            list.innerHTML += `
+            <li class="flex items-center justify-between max-w-[375px] hover:shadow-lg transition-all shadow-md bg-blue-800 text-white p-2 rounded-md mb-2">${task[i]}
+               <div class="flex gap-2">
+                 <button onclick="editTask(${i})" class="bg-blue-500 text-white px-2 py-1 rounded-md">កែប្រែ</button>
+                <button onclick="deleteTask(${i})" class="bg-red-500 text-white px-2 py-1 rounded-md">លុប</button></div>
+                </li>
+            `;
+        }
+    }
+
+    function editTask(index) {
+        let newTask = prompt("កែប្រែទិន្នន័យ", task[index]);
+        if (newTask != null && newTask.trim() != "") {
+            task[index] = newTask;
+            displayTask();
+            saveToLocal();
+        }
+    }
+
+    function deleteTask(index) {
+        task.splice(index, 1);
+        displayTask();
+        saveToLocal();
+    }
+
+    function saveToLocal() {
+        localStorage.setItem("task", JSON.stringify(task));
+    }
+
+    function loadFromLocal() {
+        let storedTask = JSON.parse(localStorage.getItem("task"));
+        if (storedTask) {
+            task = storedTask;
+            displayTask();
+        }
+    }
+</script>
+
+</html>
